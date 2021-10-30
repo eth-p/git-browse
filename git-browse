@@ -588,7 +588,7 @@ commitbrowser:action:rebase:preview() {
 }
 
 commitbrowser:action:rebase() {
-	commitbrowser:__ipc commitbrowser:tool:git rebase -i "$1"
+	commitbrowser:__ipc commitbrowser:tool:git rebase -i "$1"~1
 	commitbrowser:__ipc exit
 	return 0
 }
