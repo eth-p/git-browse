@@ -660,7 +660,7 @@ case "${__COMMITBROWSER_HELPER:-}" in
 	# Copy the commit ID.
 	copy)
 		commit="$(commitbrowser:parse:commit_from_git_log "$(cat)")" || exit 1
-
+		commitbrowser:tool:git rev-parse "$commit" | commitbrowser:tool:pbcopy
 		;;
 
 	# Open the action menu.
