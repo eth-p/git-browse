@@ -401,6 +401,12 @@ commitbrowser:tool:pbcopy() {
 		return 0
 	fi
 
+	# Try OSC52.
+	if command -v base64 &>/dev/null; then
+		printf "\x1B]52;;%s\a" "$(printf "%s" "$(cat)" | command base64)" 1>/dev/tty
+		return 0
+	fi
+
 	return 1
 }
 
