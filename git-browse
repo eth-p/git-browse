@@ -482,6 +482,10 @@ commitbrowser:display_commit_description() {
 #   $1  The commit hash.
 #   $2  [Optional] Against which ref?
 commitbrowser:display_commit_diff() {
+	if ! commitbrowser:tool:git rev-parse "${2:-$1~1}" &>/dev/null; then
+		return
+	fi
+
 	commitbrowser:tool:git diff "${2:-$1~1}" "$1" \
 	| {
 		if command -v delta &>/dev/null; then
@@ -499,6 +503,10 @@ commitbrowser:display_commit_diff() {
 #   $1  The commit hash.
 #   $2  [Optional] Against which ref?
 commitbrowser:display_commit_diff_summary() {
+	if ! commitbrowser:tool:git rev-parse "${2:-$1~1}" &>/dev/null; then
+		return
+	fi
+
 	commitbrowser:tool:git -c 'color.diff=always' diff --stat "${2:-$1~1}" "$1" \
 	| commitbrowser:tool:tac | {
 		# Print the last line first.
