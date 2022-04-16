@@ -472,12 +472,13 @@ commitbrowser:display_commit_description() {
 
 	local commit_metadata="$(sed '/^$/q' <<< "$info")"
 	local commit_message="$(sed '1,/^$/ d; s/^    //' <<< "$info")"
+	local commit_signer="Signed: $(commitbrowser:get_commit_signer "$1")"
 
 	# Wrap the commit message.
 	commit_message="$(fold -w "$(commitbrowser:util:term_width)" -s <<< "$commit_message")"
 	
 	# Pretty print the commit.
-	printf "%s\n\n%s\n" "$commit_metadata" "$commit_message" \
+	printf "%s\n%s\n\n%s\n" "$commit_metadata" "$commit_signer" "$commit_message" \
 		| commitbrowser:tool:bat - --tabs=0 --language=gitlog --plain
 }
 
@@ -524,6 +525,25 @@ commitbrowser:display_commit_diff_summary() {
 		# Print the remaining lines in order.
 		commitbrowser:tool:tac | sed 's/^ //'
 	}
+}
+
+# Function: commitbrowser:get_commit_signer
+# Returns the name and email of the key that signed the commit.
+#
+# Args:
+#   $1  The commit hash.
+commitbrowser:get_commit_signer() {
+	local verify_output="$(commitbrowser:tool:git verify-commit "$1" --raw 2>&1)"
+
+	if grep 'GOODSIG' <<< "$verify_output" | sed 's/.*[0-9A-Z]\{1,\} \(.*\)$/\1/'; then
+		return 0
+	fi
+
+	if grep 'NO_PUBKEY' <<< "$verify_output" | sed 's/.* NO_PUBKEY \(.*\)$/\1/'; then
+		return 0
+	fi
+
+	printf "\x1B[33m%s\x1B[0m\n" 'Unsigned'
 }
 
 
